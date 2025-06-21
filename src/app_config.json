@@ -1,0 +1,12 @@
+[
+    {
+	"branch": "repos",
+	"app_name": "my-awesome-project",
+	"executable": "Starting my awesome project"
+    },
+    {
+	"branch": "repos",
+	"app_name": "my-boring-project",
+	"executable": "Starting my lame, boring project"
+    }
+]
