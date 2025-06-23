@@ -7,8 +7,9 @@ use crate::commands::AppCommand;
 fn main() {
     // Read the command arguments
     // A command will follow the following pattern
-    //     app-tree <branch> <app>
-    // For example, app-tree repos my-awesome-project
+    //     app-tree <action> <args..N>
+    // For example, app-tree open repos my-awesome-project
+
     // Get the command first. Possible arguments are add/open.
     // Also, handle incorrect command too
     let app_command: AppCommand = commands::read_app_command();
@@ -25,6 +26,13 @@ fn main() {
                 println!("{error}")
             }
         }
+        AppCommand::Remove => {
+            let execute_remove_result = commands::execute_remove();
+            if let Err(error) = execute_remove_result {
+                println!("{error}")
+            }
+        }
+
         AppCommand::Incorrect => {
             println!("Incorrect command. Allowed commands are open | add")
         }

@@ -18,6 +18,7 @@ pub fn write_config(config: Vec<Action>) -> Result<(), String> {
     let mut apps_file = match File::options()
         .read(true)
         .write(true)
+        .truncate(true)
         .open("app_config.json")
     {
         Ok(file) => file,
