@@ -14,13 +14,17 @@ fn main() {
     let app_command: AppCommand = commands::read_app_command();
     match app_command {
         AppCommand::Add => {
-            let add_result = commands::execute_add();
-            match add_result {
-                Ok(_) => println!("Element added correctly"),
-                Err(error) => println!("{error}"),
+            let execute_add_result = commands::execute_add();
+            if let Err(error) = execute_add_result {
+                println!("{error}");
             }
         }
-        AppCommand::Open => commands::execute_open(),
+        AppCommand::Open => {
+            let execute_open_result = commands::execute_open();
+            if let Err(error) = execute_open_result {
+                println!("{error}")
+            }
+        }
         AppCommand::Incorrect => {
             println!("Incorrect command. Allowed commands are open | add")
         }
