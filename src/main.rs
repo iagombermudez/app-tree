@@ -32,9 +32,14 @@ fn main() {
                 println!("{error}")
             }
         }
-
+        AppCommand::List => {
+            let execute_remove_result = commands::execute_list();
+            if let Err(error) = execute_remove_result {
+                println!("{error}")
+            }
+        }
         AppCommand::Incorrect => {
-            println!("Incorrect command. Allowed commands are open | add")
+            println!("Incorrect command. Allowed commands are <open>, <add>, <remove>, <list>.")
         }
     };
 }

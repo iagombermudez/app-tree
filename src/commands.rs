@@ -5,6 +5,7 @@ pub enum AppCommand {
     Add,
     Open,
     Remove,
+    List,
     Incorrect,
 }
 
@@ -16,6 +17,7 @@ pub fn read_app_command() -> AppCommand {
         _ if command_arg == "add" => AppCommand::Add,
         _ if command_arg == "open" => AppCommand::Open,
         _ if command_arg == "remove" => AppCommand::Remove,
+        _ if command_arg == "list" => AppCommand::List,
         _ => AppCommand::Incorrect,
     };
     return command;
@@ -101,6 +103,22 @@ pub fn execute_remove() -> Result<(), String> {
                 }
                 None => Err(format!("Action {} was not found", action_name)),
             };
+        }
+        Err(e) => Err(format!("{e}")),
+    };
+}
+
+pub fn execute_list() -> Result<(), String> {
+    //Remove example
+    //app-tree remove my-awesome-project
+    let actions_result = config::read_config();
+    return match actions_result {
+        Ok(actions) => {
+            println!("NAME --- ACTION");
+            for action in actions.iter() {
+                println!("{} --- {}", action.name, action.command)
+            }
+            Ok(())
         }
         Err(e) => Err(format!("{e}")),
     };
