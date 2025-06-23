@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AppLeaf {
-    pub command: String,
     pub app_name: String,
     pub executable: String,
 }
