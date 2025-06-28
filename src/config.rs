@@ -1,4 +1,4 @@
-use crate::models::action::{ActionComponent, ActionJSON, ActionLeaf};
+use crate::models::action::{ActionComponent, ActionComposite, ActionJSON, ActionLeaf};
 use std::io::Write;
 use std::{fs::File, io::BufWriter};
 
@@ -10,30 +10,34 @@ pub fn read_config() -> Result<Vec<ActionComponent>, String> {
     if apps_file.metadata().unwrap().len() == 0 {
         return Ok(Vec::new());
     };
-    let apps_json: Vec<ActionJSON> =
+    let actions_json: Vec<ActionJSON> =
         serde_json::from_reader(apps_file).expect("JSON could not be parsed");
-    let mut actions: Vec<ActionComponent> = vec![];
-    for app in apps_json.iter() {
-        parse_to_actions(&mut actions, app);
-    }
+    let actions: Vec<ActionComponent> = parse_to_actions(&actions_json);
     return Ok(actions);
 }
 
-fn parse_to_actions(actions: &mut Vec<ActionComponent>, action: &ActionJSON) {
-    match &action.command {
-        Some(command) => actions.push(ActionComponent::Leaf(ActionLeaf::new(
-            action.name.to_string(),
-            command.to_string(),
-        ))),
-        _ => match &action.actions {
-            Some(app_actions) => {
-                for action in app_actions.iter() {
-                    parse_to_actions(actions, action);
+fn parse_to_actions(json: &Vec<ActionJSON>) -> Vec<ActionComponent> {
+    let mut actions: Vec<ActionComponent> = vec![];
+    for action in json.iter() {
+        match &action.command {
+            Some(command) => actions.push(ActionComponent::Leaf(ActionLeaf::new(
+                action.name.to_string(),
+                command.to_string(),
+            ))),
+            _ => match &action.actions {
+                Some(app_actions) => {
+                    let inner_actions = parse_to_actions(app_actions);
+                    let composite = ActionComponent::Component(ActionComposite {
+                        name: action.name.clone(),
+                        actions: inner_actions,
+                    });
+                    actions.push(composite);
                 }
-            }
-            _ => panic!("No command or branch provided, this should not happen"),
-        },
+                _ => panic!("No command or branch provided, this should not happen"),
+            },
+        }
     }
+    return actions;
 }
 
 pub fn write_config(actions: Vec<ActionComponent>) -> Result<(), String> {
