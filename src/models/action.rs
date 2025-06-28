@@ -14,7 +14,7 @@ pub trait Action {
     fn execute(&self) -> ();
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ActionLeaf {
     pub name: String,
     pub command: String,
@@ -40,20 +40,13 @@ impl Action for ActionLeaf {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ActionComposite {
     pub name: String,
     pub actions: Vec<ActionComponent>,
 }
 
 impl ActionComposite {
-    pub fn new(name: String) -> Self {
-        Self {
-            name,
-            actions: vec![],
-        }
-    }
-
     pub fn add(&mut self, action: ActionComponent) {
         self.actions.push(action);
     }
@@ -80,7 +73,7 @@ impl Action for ActionComposite {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum ActionComponent {
     Leaf(ActionLeaf),
     Component(ActionComposite),

@@ -47,7 +47,6 @@ pub fn write_config(config: Vec<ActionComponent>) -> Result<(), String> {
         Err(_) => File::create("app_config.json").expect("File could not be created"),
     };
 
-    let mut actions_json: Vec<ActionJSON>;
     let result_writter_json = serde_json::to_writer(&mut apps_file, &config);
     return match result_writter_json {
         Ok(_) => {

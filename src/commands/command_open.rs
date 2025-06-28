@@ -1,6 +1,7 @@
-use std::process::Command;
-
-use crate::config;
+use crate::{
+    config,
+    models::action::{Action, ActionComponent},
+};
 
 pub fn execute_open() -> Result<(), std::string::String> {
     let actions_result = config::read_config();
@@ -11,15 +12,16 @@ pub fn execute_open() -> Result<(), std::string::String> {
                 .expect("Action name parameter is missing");
 
             //Look for the app and execute the command if found
-            let find_action_result = actions.iter().find(|action| action.name == action_name);
+            let find_action_result = actions.iter().find(|action| match action {
+                ActionComponent::Leaf(leaf) => leaf.name == action_name,
+                ActionComponent::Component(component) => component.name == action_name,
+            });
             return match find_action_result {
                 Some(action) => {
-                    let command_execution_result = Command::new(&action.command).spawn();
-                    if let Err(error) = command_execution_result {
-                        return Err(format!("There was an error executing app `{}`: {error}", {
-                            &action.command
-                        }));
-                    };
+                    match action {
+                        ActionComponent::Leaf(leaf) => leaf.execute(),
+                        ActionComponent::Component(component) => component.execute(),
+                    }
                     return Ok(());
                 }
                 None => Err(format!("Action {} was not found", action_name)),

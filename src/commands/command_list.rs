@@ -1,4 +1,7 @@
-use crate::config;
+use crate::{
+    config,
+    models::action::{Action, ActionComponent},
+};
 
 pub fn execute_list() -> Result<(), String> {
     let actions_result = config::read_config();
@@ -6,7 +9,10 @@ pub fn execute_list() -> Result<(), String> {
         Ok(actions) => {
             println!("NAME --- ACTION");
             for action in actions.iter() {
-                action.print()
+                match action {
+                    ActionComponent::Leaf(leaf) => leaf.print_ln(),
+                    ActionComponent::Component(component) => component.print_ln(),
+                }
             }
             Ok(())
         }
