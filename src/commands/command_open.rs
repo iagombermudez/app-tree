@@ -14,13 +14,13 @@ pub fn execute_open() -> Result<(), std::string::String> {
             //Look for the app and execute the command if found
             let find_action_result = actions.iter().find(|action| match action {
                 ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                ActionComponent::Component(component) => component.name == action_name,
+                ActionComponent::Branch(branch) => branch.name == action_name,
             });
             return match find_action_result {
                 Some(action) => {
                     match action {
                         ActionComponent::Leaf(leaf) => leaf.execute(),
-                        ActionComponent::Component(component) => component.execute(),
+                        ActionComponent::Branch(branch) => branch.execute(),
                     }
                     return Ok(());
                 }

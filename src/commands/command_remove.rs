@@ -13,7 +13,7 @@ pub fn execute_remove() -> Result<(), String> {
             //Look for the app and execute the command if found
             let find_action_result = actions.iter().position(|action| match action {
                 ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                ActionComponent::Component(component) => component.name == action_name,
+                ActionComponent::Branch(branch) => branch.name == action_name,
             });
             return match find_action_result {
                 Some(action_index) => {

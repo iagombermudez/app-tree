@@ -1,6 +1,6 @@
 use crate::{
     config,
-    models::action::{ActionComponent, ActionComposite, ActionLeaf},
+    models::action::{ActionBranch, ActionComponent, ActionLeaf},
 };
 
 pub fn execute_add() -> Result<(), String> {
@@ -26,7 +26,7 @@ pub fn execute_add() -> Result<(), String> {
                     // Check if the app already exists
                     let action_exists: bool = actions.iter().any(|action| match action {
                         ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                        ActionComponent::Component(component) => component.name == action_name,
+                        ActionComponent::Branch(component) => component.name == action_name,
                     });
 
                     if action_exists {
@@ -44,11 +44,11 @@ pub fn execute_add() -> Result<(), String> {
                     // Check if the action already exists
                     let action_exists: bool = actions.iter().any(|action| match action {
                         ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
-                        ActionComponent::Component(component) => {
+                        ActionComponent::Branch(component) => {
                             component.name == action_branch
                                 && component.actions.iter().any(|action| match action {
                                     ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
-                                    ActionComponent::Component(component) => {
+                                    ActionComponent::Branch(component) => {
                                         component.name == action_name
                                     }
                                 })
@@ -65,26 +65,26 @@ pub fn execute_add() -> Result<(), String> {
                     });
                     let branch = actions.iter().find(|action| match action {
                         ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                        ActionComponent::Component(component) => component.name == action_name,
+                        ActionComponent::Branch(component) => component.name == action_name,
                     });
 
                     let action_component: ActionComponent = match branch {
                         Some(branch) => match branch {
                             ActionComponent::Leaf(_) => branch.clone(),
-                            ActionComponent::Component(component) => {
+                            ActionComponent::Branch(component) => {
                                 let mut composite = component.clone();
                                 composite.add(new_leaf);
-                                let new_branch = ActionComponent::Component(composite);
+                                let new_branch = ActionComponent::Branch(composite);
                                 new_branch
                             }
                         },
                         _ => {
-                            let mut composite = ActionComposite {
+                            let mut composite = ActionBranch {
                                 name: action_branch,
                                 actions: actions.clone(),
                             };
                             composite.add(new_leaf);
-                            let new_branch = ActionComponent::Component(composite);
+                            let new_branch = ActionComponent::Branch(composite);
                             new_branch
                         }
                     };

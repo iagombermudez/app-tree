@@ -1,4 +1,4 @@
-use crate::models::action::{ActionComponent, ActionComposite, ActionJSON, ActionLeaf};
+use crate::models::action::{ActionBranch, ActionComponent, ActionJSON, ActionLeaf};
 use std::io::Write;
 use std::{fs::File, io::BufWriter};
 
@@ -27,7 +27,7 @@ fn parse_to_actions(json: &Vec<ActionJSON>) -> Vec<ActionComponent> {
             _ => match &action.actions {
                 Some(app_actions) => {
                     let inner_actions = parse_to_actions(app_actions);
-                    let composite = ActionComponent::Component(ActionComposite {
+                    let composite = ActionComponent::Branch(ActionBranch {
                         name: action.name.clone(),
                         actions: inner_actions,
                     });
@@ -78,10 +78,10 @@ fn parse_to_json(actions: &Vec<ActionComponent>) -> Vec<ActionJSON> {
                 };
                 actions_json.push(action_json);
             }
-            ActionComponent::Component(component) => {
-                let inner_actions: Vec<ActionJSON> = parse_to_json(&component.actions);
+            ActionComponent::Branch(branch) => {
+                let inner_actions: Vec<ActionJSON> = parse_to_json(&branch.actions);
                 let action_json = ActionJSON {
-                    name: component.name.clone(),
+                    name: branch.name.clone(),
                     command: None,
                     actions: Some(inner_actions),
                 };

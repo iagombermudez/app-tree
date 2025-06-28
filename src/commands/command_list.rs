@@ -11,7 +11,7 @@ pub fn execute_list() -> Result<(), String> {
             for action in actions.iter() {
                 match action {
                     ActionComponent::Leaf(leaf) => leaf.print_ln(),
-                    ActionComponent::Component(component) => component.print_ln(),
+                    ActionComponent::Branch(branch) => branch.print_ln(),
                 }
             }
             Ok(())

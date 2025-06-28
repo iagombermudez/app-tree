@@ -41,24 +41,24 @@ impl Action for ActionLeaf {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct ActionComposite {
+pub struct ActionBranch {
     pub name: String,
     pub actions: Vec<ActionComponent>,
 }
 
-impl ActionComposite {
+impl ActionBranch {
     pub fn add(&mut self, action: ActionComponent) {
         self.actions.push(action);
     }
 }
 
-impl Action for ActionComposite {
+impl Action for ActionBranch {
     fn print_ln(&self) -> () {
         println!("{}", self.name);
         for action in self.actions.iter() {
             match action {
                 ActionComponent::Leaf(leaf) => leaf.print_ln(),
-                ActionComponent::Component(component) => component.print_ln(),
+                ActionComponent::Branch(branch) => branch.print_ln(),
             }
         }
     }
@@ -67,7 +67,7 @@ impl Action for ActionComposite {
         for action in self.actions.iter() {
             match action {
                 ActionComponent::Leaf(leaf) => leaf.execute(),
-                ActionComponent::Component(component) => component.execute(),
+                ActionComponent::Branch(branch) => branch.execute(),
             }
         }
     }
@@ -76,5 +76,5 @@ impl Action for ActionComposite {
 #[derive(Serialize, Deserialize, Clone)]
 pub enum ActionComponent {
     Leaf(ActionLeaf),
-    Component(ActionComposite),
+    Branch(ActionBranch),
 }
