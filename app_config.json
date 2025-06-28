@@ -1,1 +1,1 @@
-[{"name":"repos","actions": [{"name": "my-project", "command": "ls"}]},{"name":"a-test","command":"ls"},{"name":"a-test-2","command":"ls"}]
+[{"name":"my-project","command":"ls","actions":null},{"name":"a-test","command":"ls","actions":null},{"name":"a-test-2","command":"ls","actions":null},{"name":"test3","command":"ls","actions":null}]
