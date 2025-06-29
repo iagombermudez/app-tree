@@ -13,7 +13,6 @@ pub fn execute_add() -> Result<(), String> {
 
             // Read the app_name and executable arguments
             let num_args = std::env::args().len();
-            let action_branch: String;
             let action_name = std::env::args()
                 .nth(std::env::args().len() - 2)
                 .expect("Action name parameter is missing");
@@ -22,74 +21,8 @@ pub fn execute_add() -> Result<(), String> {
                 .expect("Executable parameter is missing");
 
             match num_args {
-                4 => {
-                    // Check if the app already exists
-                    let action_exists: bool = actions.iter().any(|action| match action {
-                        ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                        ActionComponent::Branch(component) => component.name == action_name,
-                    });
-
-                    if action_exists {
-                        return Err(format!("Command {} already exists", action_name));
-                    }
-                    //Add a new AppLeaf
-                    let action =
-                        ActionComponent::Leaf(ActionLeaf::new(action_name, action_command));
-                    actions.push(action);
-                }
-                5 => {
-                    action_branch = std::env::args()
-                        .nth(2)
-                        .expect("Action branch name parameter is missing");
-                    // Check if the action already exists
-                    let action_exists: bool = actions.iter().any(|action| match action {
-                        ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
-                        ActionComponent::Branch(component) => {
-                            component.name == action_branch
-                                && component.actions.iter().any(|action| match action {
-                                    ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
-                                    ActionComponent::Branch(component) => {
-                                        component.name == action_name
-                                    }
-                                })
-                        }
-                    });
-                    if action_exists {
-                        return Err(format!("Command {} already exists", action_name));
-                    }
-
-                    //Create new AppLeaf
-                    let new_leaf = ActionComponent::Leaf(ActionLeaf {
-                        name: action_name.clone(),
-                        command: action_command,
-                    });
-                    let branch = actions.iter().find(|action| match action {
-                        ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                        ActionComponent::Branch(component) => component.name == action_name,
-                    });
-
-                    let action_component: ActionComponent = match branch {
-                        Some(branch) => match branch {
-                            ActionComponent::Leaf(_) => branch.clone(),
-                            ActionComponent::Branch(component) => {
-                                let mut composite = component.clone();
-                                composite.add(new_leaf);
-                                let new_branch = ActionComponent::Branch(composite);
-                                new_branch
-                            }
-                        },
-                        _ => {
-                            let mut composite = ActionBranch {
-                                name: action_branch,
-                                actions: actions.clone(),
-                            };
-                            composite.add(new_leaf);
-                            let new_branch = ActionComponent::Branch(composite);
-                            new_branch
-                        }
-                    };
-                    actions.push(action_component)
-                }
+                4 => add_action(&mut actions, &action_name, &action_command),
+                5 => add_action_to_branch(&mut actions, action_name, action_command),
                 _ => panic!("Incorrect number of args"),
             };
             let save_result = config::write_config(actions.clone());
@@ -97,4 +30,76 @@ pub fn execute_add() -> Result<(), String> {
         }
         Err(e) => Err(format!("Error {}", e)),
     }
+}
+
+fn add_action(
+    actions: &mut Vec<ActionComponent>,
+    action_name: &String,
+    action_command: &String,
+) -> Option<Result<(), String>> {
+    let action_exists: bool = actions.iter().any(|action| match action {
+        ActionComponent::Leaf(leaf) => leaf.name == *action_name,
+        ActionComponent::Branch(_) => false,
+    });
+    if action_exists {
+        return Some(Err(format!("Command {} already exists", action_name)));
+    }
+    let action =
+        ActionComponent::Leaf(ActionLeaf::new(action_name.clone(), action_command.clone()));
+    actions.push(action);
+    None
+}
+
+fn add_action_to_branch(
+    actions: &mut Vec<ActionComponent>,
+    action_name: String,
+    action_command: String,
+) -> Option<Result<(), String>> {
+    let branch_name = std::env::args()
+        .nth(2)
+        .expect("Action branch name parameter is missing");
+    let action_exists: bool = actions.iter().any(|action| match action {
+        ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
+        ActionComponent::Branch(branch) => {
+            branch.name == branch_name
+                && branch.actions.iter().any(|action| match action {
+                    ActionComponent::Leaf(leaf) => leaf.name == &*action_name,
+                    ActionComponent::Branch(_) => false,
+                })
+        }
+    });
+    if action_exists {
+        return Some(Err(format!("Action {} already exists", action_name)));
+    }
+    let new_leaf = ActionComponent::Leaf(ActionLeaf {
+        name: action_name.clone(),
+        command: action_command,
+    });
+    let find_branch_result = actions.iter().position(|action| match action {
+        ActionComponent::Branch(branch) => branch.name == branch_name,
+        _ => panic!("at the disco"),
+    });
+    match find_branch_result {
+        Some(branch_position) => {
+            let branch_component = &actions[branch_position];
+            match branch_component {
+                ActionComponent::Branch(branch) => {
+                    let mut branch_clone = branch.clone();
+                    branch_clone.add(new_leaf);
+                    actions[branch_position] = ActionComponent::Branch(branch_clone);
+                }
+                _ => panic!("This should be a branch"),
+            }
+        }
+        _ => {
+            let mut composite = ActionBranch {
+                name: branch_name,
+                actions: actions.clone(),
+            };
+            composite.add(new_leaf);
+            let new_branch = ActionComponent::Branch(composite);
+            actions.push(new_branch)
+        }
+    };
+    None
 }
