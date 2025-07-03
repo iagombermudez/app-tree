@@ -10,8 +10,8 @@ pub fn execute_list() -> Result<(), String> {
             println!("NAME --- ACTION");
             for action in actions.iter() {
                 match action {
-                    ActionComponent::Leaf(leaf) => leaf.print_ln(),
-                    ActionComponent::Branch(branch) => branch.print_ln(),
+                    ActionComponent::Leaf(leaf) => println!("{}", leaf.to_string(0)),
+                    ActionComponent::Branch(branch) => println!("{}", branch.to_string(0)),
                 }
             }
             Ok(())

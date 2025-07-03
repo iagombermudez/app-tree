@@ -10,7 +10,7 @@ pub struct ActionJSON {
 }
 
 pub trait Action {
-    fn print_ln(&self) -> ();
+    fn to_string(&self, num_indents: usize) -> String;
     fn execute(&self) -> ();
 }
 
@@ -27,8 +27,9 @@ impl ActionLeaf {
 }
 
 impl Action for ActionLeaf {
-    fn print_ln(&self) -> () {
-        println!("{} --- {}", self.name, self.command);
+    fn to_string(&self, num_indents: usize) -> String {
+        let indent = vec!["  "; num_indents].join("");
+        return format!("{}{} --- {}\n", indent, self.name, self.command);
     }
 
     fn execute(&self) -> () {
@@ -53,14 +54,17 @@ impl ActionBranch {
 }
 
 impl Action for ActionBranch {
-    fn print_ln(&self) -> () {
-        println!("{}", self.name);
+    fn to_string(&self, num_indents: usize) -> String {
+        let indent = vec!["  "; num_indents].join("");
+        let mut action_listing = format!("{}{}\n", indent, self.name);
         for action in self.actions.iter() {
-            match action {
-                ActionComponent::Leaf(leaf) => leaf.print_ln(),
-                ActionComponent::Branch(branch) => branch.print_ln(),
-            }
+            let child_listing = match action {
+                ActionComponent::Leaf(leaf) => &leaf.to_string(num_indents + 1),
+                ActionComponent::Branch(branch) => &branch.to_string(num_indents + 1),
+            };
+            action_listing.push_str(child_listing);
         }
+        return action_listing;
     }
 
     fn execute(&self) -> () {
