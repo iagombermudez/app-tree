@@ -57,7 +57,8 @@ pub fn execute_remove() -> Result<(), String> {
                                     if let Some(action_position) = find_action_result {
                                         let mut cloned_branch = branch.clone();
                                         cloned_branch.actions.remove(action_position);
-                                        actions.remove(branch_position)
+                                        actions.remove(branch_position);
+                                        actions.push(ActionComponent::Branch(cloned_branch));
                                     } else {
                                         panic!("PANICO");
                                     }
