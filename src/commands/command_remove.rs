@@ -35,30 +35,41 @@ pub fn execute_remove() -> Result<(), String> {
                         .expect("Action name parameter is missing");
 
                     //Look for the app and execute the command if found
-                    let find_branch_result = actions.iter().find(|action| match action {
+                    let find_branch_position = actions.iter().position(|action| match action {
                         ActionComponent::Branch(branch) => branch.name == branch_name,
                         _ => false,
                     });
-                    return match find_branch_result {
-                        Some(branch_component) => {
-                            let find_action_result = match branch_component {
-                                ActionComponent::Branch(branch) => {
-                                    branch.actions.iter().position(|action| match action {
-                                        ActionComponent::Leaf(leaf) => leaf.name == action_name,
-                                        _ => false,
-                                    })
-                                }
-                                _ => None,
-                            };
-                            match find_action_result {
-                                Some(action_position) => actions.remove(action_position),
-                                None => panic!("Action not found"),
-                            };
 
-                            return config::write_config(actions);
+                    if let Some(branch_position) = find_branch_position {
+                        let mut find_branch_result = actions.iter().find(|action| match action {
+                            ActionComponent::Branch(branch) => branch.name == branch_name,
+                            _ => false,
+                        });
+
+                        if let Some(branch_component) = &mut find_branch_result {
+                            match branch_component {
+                                ActionComponent::Branch(branch) => {
+                                    let find_action_result =
+                                        branch.actions.iter().position(|action| match action {
+                                            ActionComponent::Leaf(leaf) => leaf.name == action_name,
+                                            _ => false,
+                                        });
+                                    if let Some(action_position) = find_action_result {
+                                        let mut cloned_branch = branch.clone();
+                                        cloned_branch.actions.remove(action_position);
+                                        actions.remove(branch_position)
+                                    } else {
+                                        panic!("PANICO");
+                                    }
+                                }
+                                _ => panic!("PANICO"),
+                            };
                         }
-                        None => Err(format!("Action {} was not found", action_name)),
-                    };
+
+                        return config::write_config(actions);
+                    } else {
+                        panic!("PANICO")
+                    }
                 }
                 _ => panic!("Incorrect number of args"),
             }

@@ -1,1 +1,1 @@
-[{"name":"folder","command":null,"actions":[{"name":"action-2","command":"ls","actions":null},{"name":"action-3","command":"ls","actions":null},{"name":"action-4","command":"ls","actions":null}]},{"name":"action-1","command":"ls","actions":null}]
+[{"name":"action-1","command":"ls","actions":null}]
