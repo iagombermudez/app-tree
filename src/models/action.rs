@@ -48,6 +48,13 @@ pub struct ActionBranch {
 }
 
 impl ActionBranch {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            actions: vec![],
+        }
+    }
+
     pub fn add(&mut self, action: ActionComponent) {
         self.actions.push(action);
     }

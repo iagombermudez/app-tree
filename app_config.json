@@ -1,1 +1,1 @@
-[{"name":"action-1","command":"ls","actions":null},{"name":"folder","command":null,"actions":[{"name":"action-1","command":"ls","actions":null}]}]
+[{"name":"action-1","command":"ls","actions":null},{"name":"repo","command":null,"actions":[{"name":"my-repo-1","command":"ls","actions":null},{"name":"my-repo-2","command":"ls","actions":null}]}]

@@ -92,10 +92,7 @@ fn add_action_to_branch(
             }
         }
         _ => {
-            let mut composite = ActionBranch {
-                name: branch_name,
-                actions: actions.clone(),
-            };
+            let mut composite = ActionBranch::new(branch_name);
             composite.add(new_leaf);
             let new_branch = ActionComponent::Branch(composite);
             actions.push(new_branch)
