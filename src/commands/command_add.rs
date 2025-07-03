@@ -77,7 +77,7 @@ fn add_action_to_branch(
     });
     let find_branch_result = actions.iter().position(|action| match action {
         ActionComponent::Branch(branch) => branch.name == branch_name,
-        _ => panic!("at the disco"),
+        _ => false,
     });
     match find_branch_result {
         Some(branch_position) => {
