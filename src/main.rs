@@ -37,8 +37,16 @@ fn main() {
                 println!("{error}")
             }
         }
+        AppCommand::Help => {
+            let execute_help_result = commands::command_help::execute_help();
+            if let Err(error) = execute_help_result {
+                println!("{error}")
+            }
+        }
         AppCommand::Incorrect => {
-            println!("Incorrect command. Allowed commands are <open>, <add>, <remove>, <list>.")
+            println!(
+                "Incorrect command. Run 'app-tree --help' for more information on how to use the CLI."
+            )
         }
     };
 }
