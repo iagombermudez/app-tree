@@ -20,13 +20,18 @@ pub fn execute() -> Result<(), String> {
                 .nth(std::env::args().len() - 1)
                 .expect("Executable parameter is missing");
 
-            match num_args {
+            let actions_result = match num_args {
                 4 => add_action(&mut actions, &action_name, &action_command),
                 5 => add_action_to_branch(&mut actions, action_name, action_command),
-                _ => panic!("Incorrect number of args"),
+                _ => Err(format!("Incorrect number of args")),
             };
-            let save_result = config::write_config(actions.clone());
-            return save_result;
+            match actions_result {
+                Err(error) => return Err(error),
+                _ => {
+                    let save_result = config::write_config(actions.clone());
+                    return save_result;
+                }
+            }
         }
         Err(e) => Err(format!("Error {}", e)),
     }
@@ -36,25 +41,25 @@ fn add_action(
     actions: &mut Vec<ActionComponent>,
     action_name: &String,
     action_command: &String,
-) -> Option<Result<(), String>> {
+) -> Result<(), String> {
     let action_exists: bool = actions.iter().any(|action| match action {
         ActionComponent::Leaf(leaf) => leaf.name == *action_name,
         ActionComponent::Branch(_) => false,
     });
     if action_exists {
-        return Some(Err(format!("Command {} already exists", action_name)));
+        return Err(format!("Command {} already exists", action_name));
     }
     let action =
         ActionComponent::Leaf(ActionLeaf::new(action_name.clone(), action_command.clone()));
     actions.push(action);
-    None
+    Ok(())
 }
 
 fn add_action_to_branch(
     actions: &mut Vec<ActionComponent>,
     action_name: String,
     action_command: String,
-) -> Option<Result<(), String>> {
+) -> Result<(), String> {
     let branch_name = std::env::args()
         .nth(2)
         .expect("Action branch name parameter is missing");
@@ -69,7 +74,7 @@ fn add_action_to_branch(
         }
     });
     if action_exists {
-        return Some(Err(format!("Action {} already exists", action_name)));
+        return Err(format!("Action {} already exists", action_name));
     }
     let new_leaf = ActionComponent::Leaf(ActionLeaf {
         name: action_name.clone(),
@@ -88,7 +93,7 @@ fn add_action_to_branch(
                     branch_clone.add(new_leaf);
                     actions[branch_position] = ActionComponent::Branch(branch_clone);
                 }
-                _ => panic!("This should be a branch"),
+                _ => return Err(format!("This should be a branch")),
             }
         }
         _ => {
@@ -98,5 +103,5 @@ fn add_action_to_branch(
             actions.push(new_branch)
         }
     };
-    None
+    return Ok(());
 }

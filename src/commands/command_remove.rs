@@ -61,20 +61,18 @@ pub fn execute() -> Result<(), String> {
                                         if cloned_branch.actions.len() > 0 {
                                             actions.push(ActionComponent::Branch(cloned_branch));
                                         }
-                                    } else {
-                                        panic!("PANICO");
                                     }
                                 }
-                                _ => panic!("PANICO"),
+                                _ => panic!("Panic. This should always be a branch"),
                             };
                         }
 
                         return config::write_config(actions);
                     } else {
-                        panic!("PANICO")
+                        return Err(format!("Panic. This should always be a branch"));
                     }
                 }
-                _ => panic!("Incorrect number of args"),
+                _ => return Err(format!("Incorrect number of args")),
             }
         }
         Err(e) => Err(format!("{e}")),
