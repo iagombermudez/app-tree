@@ -1,6 +1,6 @@
 use crate::{config, models::action::ActionComponent};
 
-pub fn execute_remove() -> Result<(), String> {
+pub fn execute() -> Result<(), String> {
     //Remove example
     //app-tree remove my-awesome-project
     let actions_result = config::read_config();

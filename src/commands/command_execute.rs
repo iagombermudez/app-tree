@@ -3,7 +3,7 @@ use crate::{
     models::action::{Action, ActionComponent},
 };
 
-pub fn execute_open() -> Result<(), std::string::String> {
+pub fn execute() -> Result<(), std::string::String> {
     let actions_result = config::read_config();
     return match actions_result {
         Ok(actions) => {

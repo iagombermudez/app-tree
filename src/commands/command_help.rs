@@ -1,4 +1,4 @@
-pub fn execute_help() -> Result<(), String> {
+pub fn execute() -> Result<(), String> {
     println!(
         "{}",
         format!(
@@ -6,7 +6,7 @@ pub fn execute_help() -> Result<(), String> {
 With this tool you can save commands like you would do using alias in bash, but you can also
 execute multiple related commands at the same time. For example, you could create a repositories
 folder, and include all your projects inside it. Then, you could execute the repositories folder,
-calling 'app-tree open repositories' and it will open all of your projects however you like.
+calling 'app-tree execute repositories' and it will execute all of your projects however you like.
 
 List of commands:
 
@@ -34,14 +34,14 @@ List of commands:
             Example:
                 $ app-tree list
 
-<open>:     Executes a given action or a set of actions if the parameter given is a branch.
+<execute>:     Executes a given action or a set of actions if the parameter given is a branch.
             Params (they must be given in order). Both parameters are optional, but at least one must be given: 
                 <name-of-branch>: (optional) the name of the branch the action will be stored in
                 <name-of-action>: (optional) the name of the action to be added
             Examples:
-                $ app-tree open repositories my-awesome-project 
-                $ app-tree open repositories //open all the actions and the branch
-                $ app-tree open my-executable //if my executable is a standalone project, it opens it 
+                $ app-tree execute repositories my-awesome-project 
+                $ app-tree execute repositories //execute all the actions and the branch
+                $ app-tree execute my-executable //if my executable is a standalone project, it executes it 
 
 "
         )
