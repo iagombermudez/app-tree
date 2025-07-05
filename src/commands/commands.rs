@@ -12,7 +12,7 @@ pub fn read_app_command() -> AppCommand {
         .nth(1)
         .expect("Command parameter is missing");
     let command = match command_arg {
-        _ if command_arg == "--help" => AppCommand::Help,
+        _ if command_arg == "--help" || command_arg == "-h" => AppCommand::Help,
         _ if command_arg == "add" => AppCommand::Add,
         _ if command_arg == "open" => AppCommand::Open,
         _ if command_arg == "remove" => AppCommand::Remove,
